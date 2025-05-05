@@ -1,2 +1,5 @@
-.class
-.jar
+*.class
+*.jar
+*.log
+*.exe
+*.sh

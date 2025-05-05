@@ -57,21 +57,55 @@ public class ControllerBancoDados extends ControllerArquivos{
     }
     
     public void salvaTabelaSenhas(String site, String usuario, String senha1, String senha2, String data){
-        try{
-             String query = "INSERT INTO senhas(site, usuario , senha1, senha2, data) VALUES(?, ?, ?, ?, ?)";
-             Connection conexao = getConexaoBanco();
-             PreparedStatement preparaDeclaracao = getManipuladorBancoVariosCampos(conexao, query);
-             preparaDeclaracao.setString(1, site);
-             preparaDeclaracao.setString(2, usuario);
-             preparaDeclaracao.setString(3, senha1);
-             preparaDeclaracao.setString(4, senha2);
-             preparaDeclaracao.setString(5, "03/05/2025");
-             preparaDeclaracao.executeUpdate();
-        }
-        catch(Exception e){
-            System.out.println("ERRO DB: "+e);
+        if(!site.isEmpty() && !usuario.isEmpty()){
+            if(!site.isBlank() && !usuario.isBlank()){
+                try{
+                     String query = "INSERT INTO senhas(site, usuario, senha1, senha2, data) VALUES(?, ?, ?, ?, ?)";
+                     Connection conexao = getConexaoBanco();
+                     PreparedStatement preparaDeclaracao = getManipuladorBancoVariosCampos(conexao, query);
+                     preparaDeclaracao.setString(1, site);
+                     preparaDeclaracao.setString(2, usuario);
+                     preparaDeclaracao.setString(3, senha1);
+                     preparaDeclaracao.setString(4, senha2);
+                     preparaDeclaracao.setString(5, data);
+                     preparaDeclaracao.executeUpdate();
+                     preparaDeclaracao.close();
+                     conexao.close();
+                }
+                catch(Exception e){
+                    System.out.println("ERRO DB: "+e);
+                }
+            }    
         }
     }    
+    
+    public int atualizaTabelaSenhasPorId(int id, String site, String usuario, String senha1, String senha2){
+        if(id > 0){
+            if(!site.isEmpty() && !usuario.isEmpty()){
+                if(!site.isBlank() && !usuario.isBlank()){
+                   try{
+                        String query = "UPDATE senhas SET site=?, usuario=?, senha1=?, senha2=?  WHERE id=?";
+                        Connection conexao = getConexaoBanco();
+                        PreparedStatement preparaDeclaracao = getManipuladorBancoVariosCampos(conexao, query);
+                        preparaDeclaracao.setString(1, site);
+                        preparaDeclaracao.setString(2, usuario);
+                        preparaDeclaracao.setString(3, senha1);
+                        preparaDeclaracao.setString(4, senha2);
+                        preparaDeclaracao.setInt(5, id);
+                        preparaDeclaracao.executeUpdate();
+                        preparaDeclaracao.close();
+                        conexao.close();
+                        return id;
+                   }
+                   catch(Exception e){
+                       System.out.println("ERRO DB: "+e); 
+                       return -1;
+                   }
+                }
+            }
+        }
+        return 0;
+    }
     
     public void criarTabelaSenhasPelaPrimeiraVez(){    
         try{

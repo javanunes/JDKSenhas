@@ -14,6 +14,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import javax.crypto.BadPaddingException;
 
 import javax.crypto.spec.IvParameterSpec;
 
@@ -49,8 +50,11 @@ public class ControllerCriptografia {
             byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(informacao));
             return new String(plainText, StandardCharsets.UTF_8);
         }
+        catch(BadPaddingException e){
+            System.out.println("A chave mestra usada agora, não é mesma que foi usada para guardar os dados! Perdeu!");
+            return "?";
+        }
         catch(Exception e){
-             System.out.println("Deu erro na descriptografia do dado pois "+e);
              return "?";
         }
     }

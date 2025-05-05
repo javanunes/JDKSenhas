@@ -24,7 +24,7 @@ public class ViewDialogos {
     private static String senhaMestraParaInserirNovosRegistros = null;
 
     private static void bannerApresentacao(){
-        System.out.println("\n=================================JDKSENHAS 1.0======================================");
+        System.out.println("\n=================================JDKSENHAS 1.2======================================");
         System.out.println("=                                                                                  =");
         System.out.println("=     ajudando a guardar senhas usando java no ambiente unix em arquivos           =");
         System.out.println("=     por enquanto só aceitamos senha-mestra de 16 caracteres, nem + nem -         =");
@@ -85,6 +85,9 @@ public class ViewDialogos {
     }
     
     private static void limpaTela(){
+        for(int linhas = 0; linhas < 100; linhas++){
+            System.out.println("");
+        }
         try {
             Runtime.getRuntime().exec("clear");
             try{
@@ -96,6 +99,15 @@ public class ViewDialogos {
         } 
         catch(Exception e) {
             
+        }
+    }
+    
+    private static int stringParaInteiro(String valor){
+        try{
+            return Integer.valueOf(valor);
+        }
+        catch(Exception e){
+            return 0;
         }
     }
     
@@ -118,6 +130,7 @@ public class ViewDialogos {
                     //Para inserir um novo registro de senha, se a pessoa já digitou a senha-mestra uma vez, não precisará digitar de novo
                     if(senhaMestraParaInserirNovosRegistros == null){
                        senhaMestra = getRespostaFormaSecretaUsuario("Digite A SENHA MESTRA[16] :");
+                       System.out.println("\nSe a chave mestra for esquecida depois, os seus dados serão perdidos !!!\n");
                        setSenhaMestraParaInserirNovosRegistros(senhaMestra);
                     }
                     else{
@@ -128,6 +141,7 @@ public class ViewDialogos {
                        System.out.println("Senha mestra DEVE SER MAIOR QUE "+TAMANHO_MINIMO_SENHA_MESTRA_PROTETORA);
                        break;
                     }
+                    
                     site = getRespostaUsuario("Qual site?");
                     usuario  = getRespostaUsuario("Qual usuario?");
                     senha1 = getRespostaFormaSecretaUsuario("Senha 1 ?:");
@@ -138,6 +152,35 @@ public class ViewDialogos {
                     cbd.salvaTabelaSenhas(site, usuario, senha1, senha2, getData());
                     System.out.println("Pronto! Senha salva!");
                   break;
+                case "corrige":
+
+                    //Para inserir um novo registro de senha, se a pessoa já digitou a senha-mestra uma vez, não precisará digitar de novo
+                    if(senhaMestraParaInserirNovosRegistros == null){
+                       senhaMestra = getRespostaFormaSecretaUsuario("Digite A SENHA MESTRA[16] :");
+                       setSenhaMestraParaInserirNovosRegistros(senhaMestra);
+                    }
+                    else{
+                       senhaMestra = getSenhaMestraParaInserirNovosRegistros();
+                    }
+                    
+                    if(senhaMestra.length() < TAMANHO_MINIMO_SENHA_MESTRA_PROTETORA){
+                       System.out.println("Senha mestra DEVE SER MAIOR QUE "+TAMANHO_MINIMO_SENHA_MESTRA_PROTETORA);
+                       break;
+                    }
+                                        
+                    id = stringParaInteiro(getRespostaUsuario("ID do site a ser corrigido: "));
+                    site = getRespostaUsuario("Site correto:");
+                    usuario  = getRespostaUsuario("Usuario correto:");
+                    senha1 = getRespostaFormaSecretaUsuario("Senha correta 1 ?:");
+                    senha2 = getRespostaFormaSecretaUsuario("Senha correta 2 ?:");
+                    senha1 = cc.criptografa2x(senha1, senhaMestra);
+                    senha2 = cc.criptografa2x(senha2, senhaMestra);
+                    
+                    if( cbd.atualizaTabelaSenhasPorId(id, site, usuario, senha1, senha2) > 0 ){
+                        System.out.printf("Tentativa de atualizar registro com ID %d feita!\n",id);
+                    }
+                    
+                  break;  
                 case "acha":
                     limpaTela();
                     site = getRespostaUsuario("Contendo site: ");
@@ -190,12 +233,16 @@ public class ViewDialogos {
     }
     
     private static void getHelp(){
+        System.out.println("\n\n\n-----------------------------------------------------------------------------------------");
+        System.out.println("                                     AJUDA DO JDKSENHAS                                      \n");
         System.out.println("acha    : procura um registro de senha de um site que contenha uma string especificada");
+        System.out.println("corrige : pede o ID de um registro para trocar as suas informações por outras corretas");
         System.out.println("novo    : cria um novo registro de senha para site ou sistema");
         System.out.println("del     : paga um site pelo id depois de concordar 2 vezes dando-se um 'sim'");
         System.out.println("ver n   : mostra a senha de um site com um id de número n onde n é um número digitado por você");
         System.out.println("exit    : termina o programa");
         System.out.println("help    : exibe esse menu");
+        System.out.println("-----------------------------------------------------------------------------------------\n");
     }
     
     public static String getSenhaMestraParaInserirNovosRegistros() {
